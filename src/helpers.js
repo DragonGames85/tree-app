@@ -6,10 +6,12 @@ const findNode = (tree, key, callback) => {
       return callback(node);
     } else if (node && node.props.children) {
       return cloneElement(node, {
+        selected: false,
+        edit: false,
         children: findNode(node.props.children, key, callback),
       });
     }
-    return node;
+    return node ? cloneElement(node, { selected: false, edit: false }) : null;
   });
 };
 
@@ -24,4 +26,27 @@ export const updateTree = (tree, key, input) => {
       children: [...(node.props.children || []), input],
     });
   return findNode(tree, key, updatedNode);
+};
+
+export const showSelect = (tree, key) => {
+  const selectedNode = node =>
+    cloneElement(node, {
+      selected: true,
+      children: node.props.children
+        ? findNode(node.props.children, key, () => {})
+        : node.props.children,
+    });
+  return findNode(tree, key, selectedNode);
+};
+
+export const setEdit = (tree, key) => {
+  const selectedNode = node =>
+    cloneElement(node, {
+      edit: true,
+      selected: false,
+      children: node.props.children
+        ? findNode(node.props.children, key, () => {})
+        : node.props.children,
+    });
+  return findNode(tree, key, selectedNode);
 };

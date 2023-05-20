@@ -1,16 +1,25 @@
 import React, { useState } from "react";
 import "./App.css";
 import { Input } from "./Input";
-import { removeNode, updateTree } from "./helpers";
+import { removeNode, updateTree, showSelect, setEdit } from "./helpers";
 
 function App() {
   const [tree, setTree] = useState([]);
   const [counter, setCounter] = useState(0);
+  const [selectedKey, setSelectedKey] = useState(-1);
+
+  const select = key => {
+    setSelectedKey(key);
+    setTree(prevTree => showSelect(prevTree, key));
+  };
 
   const addNode = () => {
     setTree(currTree => [
       ...currTree,
       <Input
+        edit={false}
+        selected={false}
+        showSelected={() => select(counter)}
         addChildren={() => addChildren(counter)}
         deleteNode={() => deleteNode(counter)}
         value={"Node " + counter}
@@ -27,6 +36,9 @@ function App() {
           currTree,
           key,
           <Input
+            edit={false}
+            selected={false}
+            showSelected={() => select(currCounter)}
             key={currCounter}
             value={"Node " + currCounter}
             addChildren={() => addChildren(currCounter)}
@@ -44,6 +56,12 @@ function App() {
     });
   };
 
+  const editNode = () => {
+    setTree(prevTree => {
+      return setEdit(prevTree, selectedKey);
+    });
+  };
+
   const clearTree = () => {
     setTree([]);
     setCounter(0);
@@ -55,6 +73,7 @@ function App() {
       <div style={{ marginTop: "auto" }}>
         <button onClick={addNode}>ДОБАВИТЬ</button>
         <button onClick={clearTree}>ОЧИСТИТЬ</button>
+        <button onClick={editNode}>РЕДАКТИРОВАТЬ</button>
       </div>
     </div>
   );
